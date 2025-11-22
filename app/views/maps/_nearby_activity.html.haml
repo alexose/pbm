@@ -1,7 +1,7 @@
 %div#nearby_activity.mt_20.mb_20
   %div.bold.flex_center{:style => 'margin: 12px 0;'}
     %span.sorted_submissions
-      #{sorted_submissions.size} recent map edit(s) within 100 miles of map center
+      Showing #{pagy.from}-#{pagy.to} of #{pagy.count} recent map edit(s) within 100 miles of map center
     %span.close_activity.pointer{:onclick => "closeActivity();"}
       X
   - sorted_submissions.each do |recent_activity|
@@ -51,3 +51,23 @@
             by
             %span.bold #{recent_activity.user_name}
     .activity_hr
+
+  #next_link{:style => 'margin: 20px 10px'}
+    != pagy_nav(pagy)
+
+:javascript
+  $("#nearby_activity_container").on("click", "#next_link > nav > a", function(e) {
+    e.preventDefault();
+    let url = new URL(e.target.href);
+    let page = url.searchParams.get("page") || "";
+
+    $('#nearby_activity_container').html(loadingHTML());
+    $.get('/user_submissions/list_within_range', {
+      lat: map.getCenter().lat,
+      lon: map.getCenter().lng,
+      page: page
+    }, function(data) {
+      $('#nearby_activity_container').html(data);
+      document.getElementById("nearby_activity_container").scrollIntoView({ behavior: "smooth" });
+    });
+  });

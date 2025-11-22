@@ -56,6 +56,8 @@
     != pagy_nav(pagy)
 
 :javascript
+  $(document).trigger('activity-loaded');
+
   $("#nearby_activity_container").on("click", "#next_link > nav > a", function(e) {
     e.preventDefault();
     let url = new URL(e.target.href);
@@ -68,6 +70,5 @@
       page: page
     }, function(data) {
       $('#nearby_activity_container').html(data);
-      document.getElementById("nearby_activity_container").scrollIntoView({ behavior: "smooth" });
     });
   });

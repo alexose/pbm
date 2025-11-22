@@ -247,6 +247,10 @@
     });
   });
 
+  $(document).on('activity-loaded', function() {
+    topFunction();
+  });
+
   // show a list of recent user actions
   $('#nearby_activity_button').bind('click', function(event, ui) {
     savedLocations = $('#nearby_activity_container').html;

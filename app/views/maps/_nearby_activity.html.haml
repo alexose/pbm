@@ -65,8 +65,7 @@
 
     $('#nearby_activity_container').html(loadingHTML());
     $.get('/user_submissions/list_within_range', {
-      lat: map.getCenter().lat,
-      lon: map.getCenter().lng,
+      boundsData: getMapBoundsData(),
       page: page
     }, function(data) {
       $('#nearby_activity_container').html(data);

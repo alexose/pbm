@@ -119,7 +119,10 @@ class Location < ApplicationRecord
     Event.where(location_id: record.id).destroy_all
     LocationPictureXref.where(location_id: record.id).destroy_all
     MachineScoreXref.where("location_machine_xref_id in (select id from location_machine_xrefs where location_id = #{record.id})").destroy_all
-    LocationMachineXref.where(location_id: record.id).destroy_all
+    lmxs_to_delete = LocationMachineXref.unscoped.where(location_id: record.id)
+    lmxs_to_delete.each do |lmx|
+      lmx.destroy(force: true)
+    end
     UserFaveLocation.where(location_id: record.id).destroy_all
 
     UserSubmission.create(region_id: region&.id, location: self, submission_type: UserSubmission::DELETE_LOCATION_TYPE, submission: "Deleted #{name} (#{id})")
@@ -154,7 +157,7 @@ class Location < ApplicationRecord
   end
 
   def recent_activity
-    UserSubmission.where(submission_type: %w[new_lmx remove_machine new_condition confirm_location], location_id: self, created_at: "2019-05-03T07:00:00.00-07:00"..Date.today.end_of_day, deleted_at: nil).order("created_at DESC").limit(50)
+    UserSubmission.activity_feed.at_location(self).limit(50)
   end
 
   def former_machines
